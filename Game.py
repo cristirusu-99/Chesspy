@@ -38,7 +38,6 @@ def highlight_selection(screen, game_state, valid_positions, selected_square):
             screen.blit(surface, (col * SQUARE_SIZE, row * SQUARE_SIZE))
             surface.fill(pg.Color("yellow"))
             for position in valid_positions:
-                # print((position[1], position[0]))
                 screen.blit(surface, (position[1] * SQUARE_SIZE, position[0] * SQUARE_SIZE))
 
 

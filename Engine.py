@@ -356,7 +356,6 @@ class GameState:
             available_positions = self.get_king_or_knight_available_positions(row, col, self.board[row][col][0],
                                                                               KING_ROW_MODIFIERS, KING_COL_MODIFIERS)
             for position_index in range(len(available_positions) - 1, -1, -1):
-                print(available_positions[position_index])
                 if self.board[available_positions[position_index][0]][available_positions[position_index][1]] \
                         == enemy_queen:
                     available_positions.remove(available_positions[position_index])
