@@ -55,11 +55,11 @@ def get_move_dictionary(start_square_row, start_square_col, final_square_row, fi
 
 def get_castling_rights_dictionary(white_king_right, white_queen_right, black_king_right, black_queen_right):
     """
-
-    :param white_king_right:
-    :param white_queen_right:
-    :param black_king_right:
-    :param black_queen_right:
+    A function that return a dictionary object from that given castling rights.
+    :param white_king_right: A flag identifying the right for white to do a king side castle.
+    :param white_queen_right: A flag identifying the right for white to do a queen side castle.
+    :param black_king_right: A flag identifying the right for black to do a king side castle
+    :param black_queen_right: A flag identifying the right for black to do a queen side castle
     :return: A dictionary object of this form
     {"white_king_right": True, "white_queen_right": True, "black_king_right": True, "black_queen_right": True}
     """
@@ -73,7 +73,7 @@ def get_castling_rights_dictionary(white_king_right, white_queen_right, black_ki
 
 def get_castling_rights(castling_rights_dictionary):
     """
-
+    Function that returns the castling rights from a dictionary object.
     :param castling_rights_dictionary: A dictionary object of this form
     {"white_king_right": True, "white_queen_right": True, "black_king_right": True, "black_queen_right": True}
     :return: A (bool, bool, bool, bool) tuple.
@@ -83,6 +83,13 @@ def get_castling_rights(castling_rights_dictionary):
 
 
 def is_king_castle(start_position, final_position, moved_piece):
+    """
+    Function that tells if a given move is a king side castle.
+    :param start_position: The location of the start square in computer notation coordinates.
+    :param final_position: The location of the end square in computer notation coordinates.
+    :param moved_piece: A string identifying the the moved piece.
+    :return: True if a given move is a king side castle, False otherwise.
+    """
     if moved_piece == WHITE_KING or moved_piece == BLACK_KING:
         if final_position[1] - start_position[1] == 2:
             return True
@@ -90,6 +97,13 @@ def is_king_castle(start_position, final_position, moved_piece):
 
 
 def is_queen_castle(start_position, final_position, moved_piece):
+    """
+    Function that tells if a given move is a queen side castle.
+    :param start_position: The location of the start square in computer notation coordinates.
+    :param final_position: The location of the end square in computer notation coordinates.
+    :param moved_piece: A string identifying the the moved piece.
+    :return: True if a given move is a queen side castle, False otherwise.
+    """
     if moved_piece == WHITE_KING or moved_piece == BLACK_KING:
         if start_position[1] - final_position[1] == 2:
             return True
@@ -230,6 +244,12 @@ class GameState:
                 = get_castling_rights(self.castling_rights_log[-1])
 
     def check_valid_move(self, move):
+        """
+        Function that tells if a given move is a valid move.
+        :param move: A list of 2 tuples representing the start square and the end square in computer notation
+        coordinates.
+        :return: True if the given move is valid, False otherwise.
+        """
         if self.board[move[0][0]][move[0][1]][0] != "w" and self.white_to_move \
                 or self.board[move[0][0]][move[0][1]][0] != "b" and not self.white_to_move:
             return False
@@ -238,6 +258,11 @@ class GameState:
         return True
 
     def get_valid_moves(self):
+        """
+        Function that returns a list of all the valid moves a player can make.
+        :return: A list of lists of 2 tuples representing the start square and the end square of a move in computer
+        notation
+        """
         temp_en_passant_possible = self.en_passant_possible
         temp_castling_rights_dictionary = get_castling_rights_dictionary(self.white_king_right, self.white_queen_right,
                                                                          self.black_king_right, self.black_queen_right)
@@ -268,12 +293,21 @@ class GameState:
         return moves
 
     def in_check(self):
+        """
+        Function that tells if the current player is in check.
+        :return: True if the current player is in check, false otherwise
+        """
         if self.white_to_move:
             return self.square_under_attack(self.white_king_location)
         else:
             return self.square_under_attack(self.black_king_location)
 
     def square_under_attack(self, square_location):
+        """
+        Function that tells if a square is attacked by an enemy piece.
+        :param square_location: A tuple representing the position of the square in computer notation coordinates.
+        :return: True if the given square is attacked by an enemy piece, False otherwise.
+        """
         self.white_to_move = not self.white_to_move
         opponent_moves = self.get_all_moves()
         self.white_to_move = not self.white_to_move
@@ -283,6 +317,11 @@ class GameState:
         return False
 
     def get_all_moves(self):
+        """
+        Function that returns a list of all the moves a player can make.
+        :return: A list of lists of 2 tuples representing the start square and the end square of a move in computer
+        notation
+        """
         moves = []
         color = "w" if self.white_to_move else "b"
         for row in range(len(self.board)):
@@ -294,6 +333,12 @@ class GameState:
         return moves
 
     def get_available_positions(self, row, col):
+        """
+        Function that returns a list of all the positions that can be reached from a given position.
+        :param row: Integer representing the row of the given position in computer notation coordinates.
+        :param col: Integer representing the column of the given position in computer notation coordinates.
+        :return: A list of tuples representing the positions that can be reached from the given position
+        """
         available_positions = []
         if self.board[row][col] == BLACK_PAWN or self.board[row][col] == WHITE_PAWN:
             available_positions = self.get_pawn_available_positions(row, col, self.board[row][col][0])
@@ -319,11 +364,11 @@ class GameState:
 
     def get_pawn_available_positions(self, row, col, color):
         """
-
-        :param row:
-        :param col:
-        :param color:
-        :return:
+        Function that returns a list of all the positions that can be reached by a Pawn from a given position.
+        :param row: Integer representing the row of the given position in computer notation coordinates.
+        :param col: Integer representing the column of the given position in computer notation coordinates.
+        :param color: String representing the color of the pawn.
+        :return: A list of tuples representing the positions that can be reached from the given position.
         """
         positions = []
         direction = -1 if color == "w" else 1
@@ -343,6 +388,13 @@ class GameState:
         return positions
 
     def get_rook_available_positions(self, row, col, color):
+        """
+        Function that returns a list of all the positions that can be reached by a Rook from a given position.
+        :param row: Integer representing the row of the given position in computer notation coordinates.
+        :param col: Integer representing the column of the given position in computer notation coordinates.
+        :param color: String representing the color of the Rook.
+        :return: A list of tuples representing the positions that can be reached from the given position.
+        """
         positions = []
         enemy_pieces = BLACK_PIECES if color == "w" else WHITE_PIECES
         row_i = 1
@@ -372,6 +424,13 @@ class GameState:
         return positions
 
     def get_bishop_available_positions(self, row, col, color):
+        """
+        Function that returns a list of all the positions that can be reached by a Bishop from a given position.
+        :param row: Integer representing the row of the given position in computer notation coordinates.
+        :param col: Integer representing the column of the given position in computer notation coordinates.
+        :param color: String representing the color of the Bishop.
+        :return: A list of tuples representing the positions that can be reached from the given position.
+        """
         positions = []
         enemy_pieces = BLACK_PIECES if color == "w" else WHITE_PIECES
         iterator = 1
@@ -405,12 +464,28 @@ class GameState:
         return positions
 
     def get_queen_available_positions(self, row, col, color):
+        """
+        Function that returns a list of all the positions that can be reached by a Queen from a given position.
+        :param row: Integer representing the row of the given position in computer notation coordinates.
+        :param col: Integer representing the column of the given position in computer notation coordinates.
+        :param color: String representing the color of the Queen.
+        :return: A list of tuples representing the positions that can be reached from the given position.
+        """
         positions = []
         positions.extend(self.get_rook_available_positions(row, col, color))
         positions.extend(self.get_bishop_available_positions(row, col, color))
         return positions
 
     def get_king_or_knight_available_positions(self, row, col, color, row_modifiers, col_modifiers):
+        """
+        Function that returns a list of all the positions that can be reached by a King or Knight from a given position.
+        :param row: Integer representing the row of the given position in computer notation coordinates.
+        :param col: Integer representing the column of the given position in computer notation coordinates.
+        :param color: String representing the color of the King or Knight.
+        :param row_modifiers: The row direction modifiers of a King or Knight.
+        :param col_modifiers: The column direction modifiers of a King or Knight.
+        :return: A list of tuples representing the positions that can be reached from the given position.
+        """
         positions = []
         enemy_pieces = BLACK_PIECES if color == "w" else WHITE_PIECES
         for row_modifier, col_modifier in zip(row_modifiers, col_modifiers):
@@ -422,6 +497,12 @@ class GameState:
         return positions
 
     def get_castle_moves(self, row, col):
+        """
+        Function that returns the available castling moves from a given position.
+        :param row: Integer representing the row of the given position in computer notation coordinates.
+        :param col: Integer representing the column of the given position in computer notation coordinates.
+        :return: A list of lists of 2 tuples representing the moves that can be done from the given position.
+        """
         moves = []
         if self.square_under_attack((row, col)):
             return moves
@@ -432,6 +513,13 @@ class GameState:
         return moves
 
     def get_king_castle_moves(self, row, col):
+        """
+        Function that returns the available king side castling moves from a given position.
+        :param row: Integer representing the row of the given position in computer notation coordinates.
+        :param col: Integer representing the column of the given position in computer notation coordinates.
+        :return: A list of lists of 2 tuples representing the king side castle moves that can be done from the given
+        position.
+        """
         moves = []
         if self.board[row][col + 1] == EMPTY_SQUARE and self.board[row][col + 2] == EMPTY_SQUARE:
             if not self.square_under_attack((row, col + 1)) and not self.square_under_attack((row, col + 2)):
@@ -439,6 +527,13 @@ class GameState:
         return moves
 
     def get_queen_castle_moves(self, row, col):
+        """
+        Function that returns the available queen side castling moves from a given position.
+        :param row: Integer representing the row of the given position in computer notation coordinates.
+        :param col: Integer representing the column of the given position in computer notation coordinates.
+        :return: A list of lists of 2 tuples representing the queen side castle moves that can be done from the given
+        position.
+        """
         moves = []
         if self.board[row][col - 1] == EMPTY_SQUARE and self.board[row][col - 2] == EMPTY_SQUARE \
                 and self.board[row][col - 3] == EMPTY_SQUARE:
@@ -448,12 +543,25 @@ class GameState:
         return moves
 
     def is_en_passant(self, final_position, moved_piece):
+        """
+        Function that tells if a piece was moved in an En Passant position and if it is a valid En Passant move.
+        :param final_position: A tuple representing the position of the square in computer notation coordinates.
+        :param moved_piece: A string identifying the moved piece.
+        :return: True if the position represents a valid En Passant move, False otherwise
+        """
         if moved_piece == BLACK_PAWN or moved_piece == WHITE_PAWN:
             if final_position == self.en_passant_possible:
                 return True
         return False
 
     def is_pawn_skip(self, start_position, final_position, moved_piece):
+        """
+        Function that tells if a Pawn moved 2 squares forward at once.
+        :param start_position: A tuple representing the square where the Pawn started the move.
+        :param final_position: A tuple representing the square where the Pawn finished the move.
+        :param moved_piece: A string identifying the moved piece.
+        :return: True if a Pawn moved 2 squares forward at once, False otherwise
+        """
         self.en_passant_possible = ()
         if moved_piece == BLACK_PAWN or moved_piece == WHITE_PAWN:
             if abs(start_position[0] - final_position[0]) == 2:
@@ -462,6 +570,12 @@ class GameState:
         return False
 
     def is_pawn_promotion(self, final_position, moved_piece):
+        """
+        Function that tells if a Pawn reached promotion rank.
+        :param final_position: A tuple representing the square where the Pawn finished the move.
+        :param moved_piece: A string identifying the moved piece.
+        :return: True if a Pawn reached promotion rank, False otherwise
+        """
         self.pawn_promotion = False
         if (moved_piece == BLACK_PAWN and final_position[0] == 7) \
                 or (moved_piece == WHITE_PAWN and final_position[0] == 0):
@@ -469,12 +583,13 @@ class GameState:
             return True
         return False
 
-    def undo_en_passant(self, captured_piece, final_position):
-        direction = 1 if self.white_to_move else -1
-        self.board[final_position[0]][final_position[1]] = EMPTY_SQUARE
-        self.board[final_position[0] + direction][final_position[1]] = captured_piece
-
     def update_castling_rights(self, start_position, moved_piece):
+        """
+        Function that updates thee castling rights when a piece was moved.
+        :param start_position: A tuple representing the square from where the piece started the move.
+        :param moved_piece: A string identifying the moved piece.
+        :return: nothing
+        """
         if moved_piece == WHITE_KING:
             self.white_king_right = False
             self.white_queen_right = False
@@ -494,14 +609,23 @@ class GameState:
                 elif start_position[1] == 7:
                     self.black_king_right = False
 
-    def make_computer_move(self):
-        valid_moves = self.get_valid_moves()
-        random.seed()
-        random_move_index = random.randrange(len(valid_moves) - 1)
-        self.register_move(valid_moves[random_move_index])
-
     def promote(self, promotion):
+        """
+        Function used to promote a Pawn to a given piece.
+        :param promotion: A string identifying the promotion piece.
+        :return: nothing
+        """
         last_move = self.moves_log[-1]
         position_to_promote = get_computer_notation_for_position(last_move["final_position"])
         self.board[position_to_promote[0]][position_to_promote[1]] = str(last_move["moved_piece"][0]) + promotion
         self.await_promotion = False
+
+    def make_computer_move(self):
+        """
+        Function that makes a randomly selected valid move.
+        :return: nothing
+        """
+        valid_moves = self.get_valid_moves()
+        random.seed()
+        random_move_index = random.randrange(len(valid_moves) - 1)
+        self.register_move(valid_moves[random_move_index])

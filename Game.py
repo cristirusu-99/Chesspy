@@ -12,19 +12,22 @@ from utils import PIECES, IMAGES, SQUARE_SIZE, HEIGHT, WIDTH, DIMENSION, EMPTY_S
 
 
 def init_images():
-    """Initialize the IMAGES dictionary. Only needs to be called once, before the while loop."""
+    """
+    Initialize the IMAGES dictionary. Only needs to be called once, before the while loop.
+    :return: nothing
+    """
     for piece in PIECES:
         IMAGES[piece] = pg.transform.scale(pg.image.load("pieces/" + piece + ".png"), (SQUARE_SIZE, SQUARE_SIZE))
 
 
 def highlight_selection(screen, game_state, valid_positions, selected_square):
     """
-    
-    :param screen: 
-    :param game_state: 
-    :param valid_positions: 
-    :param selected_square: 
-    :return: 
+    Function that highlights the selected square and all the valid moves from it.
+    :param screen: A Pygame Display.
+    :param game_state: A GameState object.
+    :param valid_positions: A vector of tuples representing the valid positions in computer notation coordinates.
+    :param selected_square: A tuple representing the selected square's position in computer notation coordinates.
+    :return: nothing
     """
     if selected_square != ():
         row, col = selected_square
@@ -40,7 +43,10 @@ def highlight_selection(screen, game_state, valid_positions, selected_square):
 
 
 def draw_board(screen):
-    """Draw the squares that make up the chess board"""
+    """
+    Function that draws the squares that make up the chess board.
+    :param screen: A Pygame Display.
+    """
     colors = [pg.Color("white"), pg.Color("dark gray")]
     for row in range(DIMENSION):
         for col in range(DIMENSION):
@@ -50,9 +56,9 @@ def draw_board(screen):
 
 def draw_pieces(screen, board):
     """
-    Draw the pieces on top of the chess board
-    :param screen:
-    :param board:
+    Function that draws the pieces on top of the chess board.
+    :param screen: A Pygame Display.
+    :param board: A 8x8 2D list representing the chess board's layout, as seen from the white player's perspective.
     :return:
     """
     for row in range(DIMENSION):
@@ -64,11 +70,11 @@ def draw_pieces(screen, board):
 
 def draw_state(screen, game_state, valid_positions, selected_square):
     """
-
-    :param screen:
-    :param game_state:
-    :param valid_positions:
-    :param selected_square:
+    Function that draws a given game state and highlights the selected square and it's valid moves.
+    :param screen: A Pygame Display.
+    :param game_state: A GameState object.
+    :param valid_positions: A vector of tuples representing the valid positions in computer notation coordinates.
+    :param selected_square: A tuple representing the selected square's position in computer notation coordinates.
     :return:
     """
     draw_board(screen)
@@ -77,6 +83,12 @@ def draw_state(screen, game_state, valid_positions, selected_square):
 
 
 def draw_text(screen, text):
+    """
+    Function that draws a given text of the board.
+    :param screen: A Pygame Display.
+    :param text: A string representing the text to be drawn.
+    :return:
+    """
     font = pg.font.SysFont("Helvitca", 32, True, False)
     text_object = font.render(text, False, pg.Color("turquoise"))
     text_location = pg.Rect(0, 0, WIDTH, HEIGHT) \
@@ -87,6 +99,12 @@ def draw_text(screen, text):
 
 
 def main(computer=False):
+    """
+    Main function (entry point) of the program. It handles the user inputs and calls the computer to generate a move if
+    needed.
+    :param computer: A boolean flag that says if computer move generator must pe called.
+    :return: nothing
+    """
     pg.init()
     screen = pg.display.set_mode((WIDTH, HEIGHT))
     screen.fill(pg.Color("white"))
@@ -104,23 +122,23 @@ def main(computer=False):
                 running = False
             elif event.type == pg.MOUSEBUTTONDOWN:
                 if not game_over:
-                    location = pg.mouse.get_pos()  # [X, Y] coordinates of a mouse click in the game window.
-                    col = location[0] // SQUARE_SIZE
-                    row = location[1] // SQUARE_SIZE
-                    if selected_square == (row, col):  # player clicked the same square twice
-                        selected_square = ()  # deselect the square
-                        player_move = []  # reset the move
-                    else:
-                        selected_square = (row, col)
-                        player_move.append(selected_square)
-                    if len(player_move) == 2:  # the player has clicked to different squares and thus picked a move
-                        if game_state.check_valid_move(player_move):
-                            game_state.register_move(player_move)
-                        selected_square = ()  # reset the selected_square tuple
-                        player_move = []  # reset the player_move list
-                        if game_state.await_promotion:
-                            promotion = input(PROMOTION_TEXT + "\n")
-                            game_state.promote(promotion.upper())
+                        location = pg.mouse.get_pos()  # [X, Y] coordinates of a mouse click in the game window.
+                        col = location[0] // SQUARE_SIZE
+                        row = location[1] // SQUARE_SIZE
+                        if selected_square == (row, col):  # player clicked the same square twice
+                            selected_square = ()  # deselect the square
+                            player_move = []  # reset the move
+                        else:
+                            selected_square = (row, col)
+                            player_move.append(selected_square)
+                        if len(player_move) == 2:  # the player has clicked to different squares and thus picked a move
+                            if game_state.check_valid_move(player_move):
+                                game_state.register_move(player_move)
+                            selected_square = ()  # reset the selected_square tuple
+                            player_move = []  # reset the player_move list
+                            if game_state.await_promotion:
+                                promotion = input(PROMOTION_TEXT + "\n")
+                                game_state.promote(promotion.upper())
                         if computer:
                             game_state.make_computer_move()
             elif event.type == pg.KEYDOWN:
