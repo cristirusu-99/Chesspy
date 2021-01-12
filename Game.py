@@ -122,25 +122,25 @@ def main(computer=False):
                 running = False
             elif event.type == pg.MOUSEBUTTONDOWN:
                 if not game_over:
-                        location = pg.mouse.get_pos()  # [X, Y] coordinates of a mouse click in the game window.
-                        col = location[0] // SQUARE_SIZE
-                        row = location[1] // SQUARE_SIZE
-                        if selected_square == (row, col):  # player clicked the same square twice
-                            selected_square = ()  # deselect the square
-                            player_move = []  # reset the move
-                        else:
-                            selected_square = (row, col)
-                            player_move.append(selected_square)
-                        if len(player_move) == 2:  # the player has clicked to different squares and thus picked a move
-                            if game_state.check_valid_move(player_move):
-                                game_state.register_move(player_move)
-                            selected_square = ()  # reset the selected_square tuple
-                            player_move = []  # reset the player_move list
-                            if game_state.await_promotion:
-                                promotion = input(PROMOTION_TEXT + "\n")
-                                game_state.promote(promotion.upper())
-                        if computer:
-                            game_state.make_computer_move()
+                    location = pg.mouse.get_pos()  # [X, Y] coordinates of a mouse click in the game window.
+                    col = location[0] // SQUARE_SIZE
+                    row = location[1] // SQUARE_SIZE
+                    if selected_square == (row, col):  # player clicked the same square twice
+                        selected_square = ()  # deselect the square
+                        player_move = []  # reset the move
+                    else:
+                        selected_square = (row, col)
+                        player_move.append(selected_square)
+                    if len(player_move) == 2:  # the player has clicked to different squares and thus picked a move
+                        if game_state.check_valid_move(player_move):
+                            game_state.register_move(player_move)
+                        selected_square = ()  # reset the selected_square tuple
+                        player_move = []  # reset the player_move list
+                        if game_state.await_promotion:
+                            promotion = input(PROMOTION_TEXT + "\n")
+                            game_state.promote(promotion.upper())
+                    if computer:
+                        game_state.make_computer_move()
             elif event.type == pg.KEYDOWN:
                 if event.key == pg.K_z:
                     game_state.undo_move()
