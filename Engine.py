@@ -625,6 +625,7 @@ class GameState:
         :return: nothing
         """
         valid_moves = self.get_valid_moves()
-        random.seed()
-        random_move_index = random.randrange(len(valid_moves) - 1)
-        self.register_move(valid_moves[random_move_index])
+        if len(valid_moves) != 0:
+            random.seed()
+            random_move_index = random.randrange(len(valid_moves) - 1)
+            self.register_move(valid_moves[random_move_index])

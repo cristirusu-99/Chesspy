@@ -138,8 +138,8 @@ def main(computer=False):
                         if game_state.await_promotion:
                             promotion = input(PROMOTION_TEXT + "\n")
                             game_state.promote(promotion.upper())
-                    if computer:
-                        game_state.make_computer_move()
+                        if computer:
+                            game_state.make_computer_move()
             elif event.type == pg.KEYDOWN:
                 if event.key == pg.K_z:
                     game_state.undo_move()
