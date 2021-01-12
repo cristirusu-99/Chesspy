@@ -2,6 +2,8 @@
 This file contains elements of functionality and game logic of Chess.
 """
 # imports
+import random
+
 from utils import BLACK_BISHOP, BLACK_KING, BLACK_KNIGHT, BLACK_PAWN, BLACK_QUEEN, BLACK_ROOK, WHITE_BISHOP, \
     WHITE_KING, WHITE_KNIGHT, WHITE_PAWN, WHITE_QUEEN, WHITE_ROOK, EMPTY_SQUARE, COLUMNS_TO_FILES, ROWS_TO_RANKS, \
     RANKS_TO_ROWS, FILES_TO_COLUMNS, BLACK_PIECES, WHITE_PIECES, KING_ROW_MODIFIERS, KING_COL_MODIFIERS, \
@@ -129,6 +131,7 @@ class GameState:
         self.check_mate = False
         self.stale_mate = False
         self.pawn_promotion = False
+        self.await_promotion = False
         self.en_passant_possible = ()
         self.white_king_right = True
         self.white_queen_right = True
@@ -170,7 +173,8 @@ class GameState:
             additional_info = PAWN_SKIP
         if self.is_pawn_promotion(final_position, moved_piece):
             additional_info = PAWN_PROMOTION
-            self.board[final_square_row][final_square_col] = str(moved_piece[0]) + "Q"
+            self.await_promotion = True
+            # self.board[final_square_row][final_square_col] = str(moved_piece[0]) + "Q"
         if is_king_castle(start_position, final_position, moved_piece):
             self.board[final_square_row][final_square_col - 1] = self.board[final_square_row][final_square_col + 1]
             self.board[final_square_row][final_square_col + 1] = EMPTY_SQUARE
@@ -256,8 +260,8 @@ class GameState:
             else:
                 self.stale_mate = True
         else:
-            self.check_mate = True
-            self.stale_mate = True
+            self.check_mate = False
+            self.stale_mate = False
         self.en_passant_possible = temp_en_passant_possible
         self.white_king_right, self.white_queen_right, self.black_king_right, self.black_queen_right \
             = get_castling_rights(temp_castling_rights_dictionary)
@@ -489,3 +493,15 @@ class GameState:
                     self.black_queen_right = False
                 elif start_position[1] == 7:
                     self.black_king_right = False
+
+    def make_computer_move(self):
+        valid_moves = self.get_valid_moves()
+        random.seed()
+        random_move_index = random.randrange(len(valid_moves) - 1)
+        self.register_move(valid_moves[random_move_index])
+
+    def promote(self, promotion):
+        last_move = self.moves_log[-1]
+        position_to_promote = get_computer_notation_for_position(last_move["final_position"])
+        self.board[position_to_promote[0]][position_to_promote[1]] = str(last_move["moved_piece"][0]) + promotion
+        self.await_promotion = False

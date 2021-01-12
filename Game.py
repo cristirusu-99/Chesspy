@@ -3,10 +3,12 @@ This is the main file of the project. It is used to handle user input and to dis
 """
 
 # imports
+import sys
+
 import pygame as pg
 import Engine
 
-from utils import PIECES, IMAGES, SQUARE_SIZE, HEIGHT, WIDTH, DIMENSION, EMPTY_SQUARE, MAX_FPS
+from utils import PIECES, IMAGES, SQUARE_SIZE, HEIGHT, WIDTH, DIMENSION, EMPTY_SQUARE, MAX_FPS, PROMOTION_TEXT
 
 
 def init_images():
@@ -30,11 +32,11 @@ def highlight_selection(screen, game_state, valid_positions, selected_square):
             surface = pg.Surface((SQUARE_SIZE, SQUARE_SIZE))
             surface.set_alpha(100)
             surface.fill(pg.Color("light blue"))
-            screen.blit(surface, (col*SQUARE_SIZE, row*SQUARE_SIZE))
+            screen.blit(surface, (col * SQUARE_SIZE, row * SQUARE_SIZE))
             surface.fill(pg.Color("yellow"))
             for position in valid_positions:
                 # print((position[1], position[0]))
-                screen.blit(surface, (position[1]*SQUARE_SIZE, position[0]*SQUARE_SIZE))
+                screen.blit(surface, (position[1] * SQUARE_SIZE, position[0] * SQUARE_SIZE))
 
 
 def draw_board(screen):
@@ -74,7 +76,17 @@ def draw_state(screen, game_state, valid_positions, selected_square):
     draw_pieces(screen, game_state.board)
 
 
-def main():
+def draw_text(screen, text):
+    font = pg.font.SysFont("Helvitca", 32, True, False)
+    text_object = font.render(text, False, pg.Color("turquoise"))
+    text_location = pg.Rect(0, 0, WIDTH, HEIGHT) \
+        .move(WIDTH / 2 - text_object.get_width() / 2, HEIGHT / 2 - text_object.get_height() / 2)
+    screen.blit(text_object, text_location)
+    text_object = font.render(text, False, pg.Color("dark blue"))
+    screen.blit(text_object, text_location.move(1, 1))
+
+
+def main(computer=False):
     pg.init()
     screen = pg.display.set_mode((WIDTH, HEIGHT))
     screen.fill(pg.Color("white"))
@@ -85,41 +97,72 @@ def main():
     player_move = []  # List of two tuples that represent the starting square and the final square of a move.
     valid_positions = []
     running = True
+    game_over = False
     while running:
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 running = False
             elif event.type == pg.MOUSEBUTTONDOWN:
-                location = pg.mouse.get_pos()  # [X, Y] coordinates of a mouse click in the game window.
-                col = location[0] // SQUARE_SIZE
-                row = location[1] // SQUARE_SIZE
-                if selected_square == (row, col):  # player clicked the same square twice
-                    selected_square = ()  # deselect the square
-                    player_move = []  # reset the move
-                else:
-                    selected_square = (row, col)
-                    player_move.append(selected_square)
-                if len(player_move) == 2:  # the player has clicked to different squares and thus picked a move
-                    if game_state.check_valid_move(player_move):
-                        game_state.register_move(player_move)
-                        print(game_state.moves_log)
-                    selected_square = ()  # reset the selected_square tuple
-                    player_move = []  # reset the player_move list
-                    # print(game_state.board)
+                if not game_over:
+                    location = pg.mouse.get_pos()  # [X, Y] coordinates of a mouse click in the game window.
+                    col = location[0] // SQUARE_SIZE
+                    row = location[1] // SQUARE_SIZE
+                    if selected_square == (row, col):  # player clicked the same square twice
+                        selected_square = ()  # deselect the square
+                        player_move = []  # reset the move
+                    else:
+                        selected_square = (row, col)
+                        player_move.append(selected_square)
+                    if len(player_move) == 2:  # the player has clicked to different squares and thus picked a move
+                        if game_state.check_valid_move(player_move):
+                            game_state.register_move(player_move)
+                        selected_square = ()  # reset the selected_square tuple
+                        player_move = []  # reset the player_move list
+                        if game_state.await_promotion:
+                            promotion = input(PROMOTION_TEXT + "\n")
+                            game_state.promote(promotion.upper())
+                        if computer:
+                            game_state.make_computer_move()
             elif event.type == pg.KEYDOWN:
                 if event.key == pg.K_z:
                     game_state.undo_move()
+                    game_over = False
+                if event.key == pg.K_x:
+                    game_state = Engine.GameState()
+                    selected_square = ()
+                    player_move = []
+                    game_over = False
         if selected_square != ():
             valid_moves = game_state.get_valid_moves()
             for valid_moves_index in range(len(valid_moves) - 1, -1, -1):
                 if valid_moves[valid_moves_index][0] == selected_square:
                     valid_positions.append(valid_moves[valid_moves_index][1])
-        draw_state(screen, game_state, valid_positions,
-                   selected_square)
+        draw_state(screen, game_state, valid_positions, selected_square)
+
+        if game_state.check_mate:
+            game_over = True
+            if game_state.white_to_move:
+                draw_text(screen, "Black wins by checkmate!")
+            else:
+                draw_text(screen, "White wins by checkmate!")
+        elif game_state.stale_mate:
+            game_over = True
+            draw_text(screen, "Stalemate!")
         valid_positions = []
         clock.tick(MAX_FPS)
         pg.display.flip()
 
 
 if __name__ == "__main__":
-    main()
+    computer_play = None
+    for i, arg in enumerate(sys.argv):
+        if i == 1:
+            print(arg)
+            if arg == "Computer":
+                computer_play = True
+            elif arg == "Human":
+                computer_play = False
+    if computer_play is None:
+        print("Wrong Argument!")
+    else:
+        main(computer_play)

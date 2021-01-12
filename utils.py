@@ -50,3 +50,7 @@ HEIGHT = WIDTH = 512  # Window size
 DIMENSION = 8  # Dimensions of a chess board (8x8)
 SQUARE_SIZE = HEIGHT // DIMENSION  # Size of a board square in the GUI
 IMAGES = {}
+PROMOTION_TEXT = "Press R to promote to Rook\n" \
+                 "Press Q to promote to Queen\n" \
+                 "Press B to promote to Bishop\n" \
+                 "Press N to promote to Knight"
